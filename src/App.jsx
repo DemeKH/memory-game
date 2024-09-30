@@ -16,6 +16,9 @@ const pokemonIds = [25, 6, 1, 7, 39, 150, 95, 60, 38, 257];
 
 function App() {
   const [pokemons, setPokemons] = useState([]);
+  const [selectedPokemons, setSelectedPokemons] = useState([]);
+  const [curScore, setCurScore] = useState(0);
+  const [highScore, setHighScore] = useState(0);
 
   useEffect(() => {
     async function fetchPokemon(id) {
@@ -23,18 +26,49 @@ function App() {
       const data = await res.json();
       setPokemons((prev) => [
         ...prev,
-        { name: data.species.name, img: data.sprites.front_default },
+        {
+          name: data.species.name,
+          img: data.sprites.front_default,
+          pokeId: data.id,
+        },
       ]);
-      console.log(data);
     }
     pokemonIds.forEach(fetchPokemon);
   }, []);
 
+  useEffect(() => {
+    if (selectedPokemons.length > 0) {
+      const occurrences = selectedPokemons.filter(
+        (item) => item === selectedPokemons[selectedPokemons.length - 1]
+      ).length;
+      if (occurrences === 1) {
+        shuffleArray(pokemons);
+        setCurScore((prev) => prev + 1);
+      } else {
+        alert("you lost");
+        setSelectedPokemons([]);
+        setCurScore(0);
+      }
+    }
+  }, [selectedPokemons]);
+
+  if (curScore > highScore) {
+    setHighScore(curScore);
+  }
+  if (curScore === 10) {
+    alert("you win");
+    setSelectedPokemons([]);
+    setCurScore(0);
+  }
+
   return (
     <>
       <Header />
-      <Scores />
-      <MemoryGame pokemons={pokemons} />
+      <Scores curScore={curScore} highScore={highScore} />
+      <MemoryGame
+        pokemons={pokemons}
+        setSelectedPokemons={setSelectedPokemons}
+      />
     </>
   );
 }
