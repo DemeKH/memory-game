@@ -34,7 +34,7 @@ function App() {
     <>
       <Header />
       <Scores />
-      <MemoryGame />
+      <MemoryGame pokemons={pokemons} />
     </>
   );
 }
